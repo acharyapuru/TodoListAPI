@@ -47,7 +47,8 @@ class TaskListCreateView(ListCreateAPIView):
         if is_completed:
             queryset = queryset.filter(completed=is_completed)
         
-        serializer = self.get_serializer(queryset, many=True)
+        query = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(query, many=True)
         return Response({"data": serializer.data }, status=status.HTTP_200_OK)
     
 
