@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.http import  HttpResponse
+from .models import Task
 from rest_framework.decorators import api_view,APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -9,6 +10,8 @@ from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import MultiPartParser,FormParser
 import csv
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
 
 
@@ -135,3 +138,12 @@ class ImportCsvFileView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+def task_pdf(request,id):
+    task = get_object_or_404(Task, pk=id)
+    html_string = render_to_string('Api/task_pdf.html',{'task':task})
+    html = HTML(string=html_string)
+    pdf = html.write_pdf()
+
+    response = HttpResponse(pdf , content_type='application/pdf')
+    response['Content-Disposition'] =f'attachment; filename=todo_{task.id}.pdf'
+    return response

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Pdf</title>
+</head>
+<style>
+    @page{
+        size: a4;
+        margin: 2.5cm 1.5cm 3.5cm 1.5cm;
+        @top-content{
+            content : "Task"
+        }
+    }
+    
+</style>
+
+<body>
+
+    <h1>Title : {{ task.title }}</h1>
+    <p>Description : {{ task.description }}</p>
+    <p>Completed : {{ task.completed }}</p>
+</body>
+</html>
