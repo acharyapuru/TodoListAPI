@@ -12,6 +12,8 @@ from rest_framework.parsers import MultiPartParser,FormParser
 import csv
 from django.template.loader import render_to_string
 from weasyprint import HTML
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import TaskFilters
 
 
 
@@ -30,25 +32,30 @@ def apiOverview(request):
 class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializers
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TaskFilters
     renderer_classes = [JSONRenderer]
 
     def get(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        
+        queryset = self.filter_queryset(self.get_queryset())
+
         
         #search functionality
-        search_query = self.request.query_params.get('search',None)
-        if search_query:
-            queryset = queryset.filter(title__icontains=search_query) | queryset.filter(description__icontains=search_query)
+        #queryset = self.get_queryset()
+        #search_query = self.request.query_params.get('search',None)
+        # if search_query:
+        #     queryset = queryset.filter(title__icontains=search_query) | queryset.filter(description__icontains=search_query)
         
         #ordering
         order_by = self.request.query_params.get('order_by',None)
         if order_by:
             queryset = queryset.order_by(order_by)
         
-        #filter
-        is_completed = self.request.query_params.get('is_completed',None)
-        if is_completed:
-            queryset = queryset.filter(completed=is_completed)
+        # #filter
+        # is_completed = self.request.query_params.get('is_completed',None)
+        # if is_completed:
+        #     queryset = queryset.filter(completed=is_completed)
         
         query = self.paginate_queryset(queryset)
         serializer = self.get_serializer(query, many=True)
